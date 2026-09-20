@@ -1,20 +1,22 @@
 package academy.fiveletters;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import academy.fiveletters.model.Dictionary;
+import academy.fiveletters.model.DictionaryReader;
+import java.io.IOException;
+import java.util.List;
 
 /** Точка входа в игру «5 букв». */
 public final class Main {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Main.class);
-
     private Main() {}
 
     public static void main(String[] args) {
-        LOG.debug("Аргументы запуска: {}", String.join(" ", args));
-
-        // TODO: запустить игру.
-        System.out.println("«5 букв» — шаблон проекта Т-Академии.");
-        System.out.println("Игра ещё не реализована. Начни с README.");
+        try {
+            List<String> words = DictionaryReader.read("/dictionary.txt");
+            Dictionary dict = new Dictionary(words);
+            System.out.println("Словарь загружен: " + dict.size() + " слов");
+        } catch (IOException e) {
+            System.err.println("Не удалось загрузить словарь: " + e.getMessage());
+        }
     }
 }

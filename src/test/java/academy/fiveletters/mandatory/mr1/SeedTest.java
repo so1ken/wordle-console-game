@@ -1,8 +1,15 @@
 package academy.fiveletters.mandatory.mr1;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Disabled;
+import academy.fiveletters.game.GameService;
+import academy.fiveletters.game.GameSession;
+import academy.fiveletters.model.Dictionary;
+import academy.fiveletters.model.DictionaryReader;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -10,17 +17,32 @@ import org.junit.jupiter.api.Test;
 @DisplayName("MR1. Воспроизводимость по seed")
 class SeedTest {
 
+    private static final int MAX_ATTEMPTS = 6;
+
     @Test
-    @Disabled("MR1: реализуй тест и удали эту строку")
     @DisplayName("Одинаковый seed даёт одинаковое загаданное слово")
-    void sameSeedProducesSameAnswer() {
-        fail("Тест не реализован");
+    void sameSeedProducesSameAnswer() throws IOException {
+        Dictionary dictionary = new Dictionary(DictionaryReader.read("/dictionary.txt"));
+        GameService service = new GameService();
+
+        GameSession first = service.startGame(dictionary, MAX_ATTEMPTS, 42L);
+        GameSession second = service.startGame(dictionary, MAX_ATTEMPTS, 42L);
+
+        assertEquals(first.getAnswer(), second.getAnswer());
     }
 
     @Test
-    @Disabled("MR1: реализуй тест и удали эту строку")
     @DisplayName("Разные seed'ы дают разные слова хотя бы иногда")
-    void differentSeedsProduceDifferentAnswers() {
-        fail("Тест не реализован");
+    void differentSeedsProduceDifferentAnswers() throws IOException {
+        Dictionary dictionary = new Dictionary(DictionaryReader.read("/dictionary.txt"));
+        GameService service = new GameService();
+
+        Set<String> answers = new HashSet<>();
+        for (long seed = 1; seed <= 10; seed++) {
+            GameSession session = service.startGame(dictionary, MAX_ATTEMPTS, seed);
+            answers.add(session.getAnswer());
+        }
+
+        assertTrue(answers.size() > 1, "10 разных seed'ов дали только одно слово — seed не влияет");
     }
 }
