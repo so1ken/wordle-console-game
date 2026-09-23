@@ -1,51 +1,71 @@
 package academy.fiveletters.mandatory.mr2;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Disabled;
+import academy.fiveletters.game.GameService;
+import academy.fiveletters.game.GameSession;
+import academy.fiveletters.game.GuessResult;
+import academy.fiveletters.model.Dictionary;
+import academy.fiveletters.model.DictionaryReader;
+import java.io.IOException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
-/** Обязательные тесты: валидация ввода. */
 @DisplayName("MR2. Валидация ввода")
 class GuessValidationTest {
 
-    @ParameterizedTest
-    @ValueSource(strings = {"дом", "домики", ""})
-    @Disabled("MR2: реализуй тест и удали эту строку")
-    @DisplayName("Слово не из 5 букв отклоняется: \"{0}\"")
-    void wordOfWrongLengthIsRejected(String guess) {
-        fail("Тест не реализован");
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"дом12", "дом!!", "до ма"})
-    @Disabled("MR2: реализуй тест и удали эту строку")
-    @DisplayName("Ввод с не-буквами отклоняется: \"{0}\"")
-    void nonLetterInputIsRejected(String guess) {
-        fail("Тест не реализован");
-    }
+    private static final int MAX_ATTEMPTS = 6;
 
     @Test
-    @Disabled("MR2: реализуй тест и удали эту строку")
-    @DisplayName("Слово, которого нет в словаре, отклоняется")
-    void wordOutsideDictionaryIsRejected() {
-        fail("Тест не реализован");
-    }
-
-    @Test
-    @Disabled("MR2: реализуй тест и удали эту строку")
     @DisplayName("Некорректный ввод не тратит попытку")
-    void invalidInputDoesNotConsumeAttempt() {
-        fail("Тест не реализован");
+    void invalidInputDoesNotSpendAttempt() throws IOException {
+        Dictionary dict = new Dictionary(DictionaryReader.read("/dictionary.txt"));
+        GameService service = new GameService(dict);
+        GameSession session = new GameSession("озеро", MAX_ATTEMPTS);
+
+        int attemptsBefore = session.getAttemptsUsed();
+
+        // Слишком короткое слово
+        assertThrows(IllegalArgumentException.class, () -> service.applyGuess(session, "дом"));
+        // Слишком длинное
+        assertThrows(IllegalArgumentException.class, () -> service.applyGuess(session, "озерко"));
+        // Не буквы
+        assertThrows(IllegalArgumentException.class, () -> service.applyGuess(session, "12345"));
+        // Слова нет в словаре
+        assertThrows(IllegalArgumentException.class, () -> service.applyGuess(session, "фывап"));
+
+        assertEquals(attemptsBefore, session.getAttemptsUsed());
+        assertTrue(session.getAttemptsHistory().isEmpty());
     }
 
     @Test
-    @Disabled("MR2: реализуй тест и удали эту строку")
     @DisplayName("Ввод не зависит от регистра: \"ОЗЕРО\" и \"озеро\" обрабатываются одинаково")
-    void inputIsCaseInsensitive() {
-        fail("Тест не реализован");
+    void inputIsCaseInsensitive() throws IOException {
+        Dictionary dict = new Dictionary(DictionaryReader.read("/dictionary.txt"));
+        GameService service = new GameService(dict);
+
+        // Две отдельные сессии с одинаковым ответом
+        GameSession session1 = new GameSession("озеро", MAX_ATTEMPTS);
+        GameSession session2 = new GameSession("озеро", MAX_ATTEMPTS);
+
+        GuessResult upper = service.applyGuess(session1, "ОЗЕРО");
+        GuessResult lower = service.applyGuess(session2, "озеро");
+
+        // Результаты должны быть одинаковые
+        assertEquals(lower.getStatuses(), upper.getStatuses());
+    }
+
+    @Test
+    @DisplayName("Слово, которого нет в словаре, отклоняется")
+    void unknownWordIsRejected() throws IOException {
+        Dictionary dict = new Dictionary(DictionaryReader.read("/dictionary.txt"));
+        GameService service = new GameService(dict);
+        GameSession session = new GameSession("озеро", MAX_ATTEMPTS);
+
+        assertThrows(IllegalArgumentException.class, () -> service.applyGuess(session, "фывап"));
+
+        assertEquals(0, session.getAttemptsUsed());
     }
 }

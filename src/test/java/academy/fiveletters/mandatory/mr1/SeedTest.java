@@ -23,10 +23,10 @@ class SeedTest {
     @DisplayName("Одинаковый seed даёт одинаковое загаданное слово")
     void sameSeedProducesSameAnswer() throws IOException {
         Dictionary dictionary = new Dictionary(DictionaryReader.read("/dictionary.txt"));
-        GameService service = new GameService();
+        GameService service = new GameService(dictionary);
 
-        GameSession first = service.startGame(dictionary, MAX_ATTEMPTS, 42L);
-        GameSession second = service.startGame(dictionary, MAX_ATTEMPTS, 42L);
+        GameSession first = service.startGame(MAX_ATTEMPTS, 42L);
+        GameSession second = service.startGame(MAX_ATTEMPTS, 42L);
 
         assertEquals(first.getAnswer(), second.getAnswer());
     }
@@ -35,11 +35,11 @@ class SeedTest {
     @DisplayName("Разные seed'ы дают разные слова хотя бы иногда")
     void differentSeedsProduceDifferentAnswers() throws IOException {
         Dictionary dictionary = new Dictionary(DictionaryReader.read("/dictionary.txt"));
-        GameService service = new GameService();
+        GameService service = new GameService(dictionary);
 
         Set<String> answers = new HashSet<>();
         for (long seed = 1; seed <= 10; seed++) {
-            GameSession session = service.startGame(dictionary, MAX_ATTEMPTS, seed);
+            GameSession session = service.startGame(MAX_ATTEMPTS, seed);
             answers.add(session.getAnswer());
         }
 
