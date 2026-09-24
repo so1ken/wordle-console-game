@@ -15,10 +15,6 @@ public class GameService {
     }
 
     public GameSession startGame(int maxAttempts, long seed) {
-        if (maxAttempts <= 0) {
-            throw new IllegalArgumentException("Количество попыток <= 0");
-        }
-
         Random random = new Random(seed);
         int index = random.nextInt(dict.size());
 
@@ -51,11 +47,11 @@ public class GameService {
             session.recordAttempt(normalized);
             session.finishGame(GameStatus.WIN);
             return new GuessResult(List.of(
-                    LetterStatus.CORRECT,
-                    LetterStatus.CORRECT,
-                    LetterStatus.CORRECT,
-                    LetterStatus.CORRECT,
-                    LetterStatus.CORRECT));
+                LetterStatus.CORRECT,
+                LetterStatus.CORRECT,
+                LetterStatus.CORRECT,
+                LetterStatus.CORRECT,
+                LetterStatus.CORRECT));
         }
 
         List<LetterStatus> statuses = computeStatuses(session.getAnswer(), normalized);
