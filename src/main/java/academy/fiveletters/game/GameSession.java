@@ -28,6 +28,28 @@ public final class GameSession {
         this.status = GameStatus.IN_PROGRESS;
     }
 
+    public void recordAttempt(String guess) {
+        if (isFinished()) {
+            throw new IllegalStateException("Игра уже завершена");
+        }
+        attemptsHistory.add(guess);
+        attemptsUsed++;
+    }
+
+    public void finishGame(GameStatus status) {
+        if (status == GameStatus.IN_PROGRESS) {
+            throw new IllegalArgumentException("Нельзя завершить игру со статусом IN_PROGRESS");
+        }
+        if (isFinished()) {
+            throw new IllegalStateException("Игра уже завершена");
+        }
+        this.status = status;
+    }
+
+    public boolean isFinished() {
+        return status != GameStatus.IN_PROGRESS;
+    }
+
     public String getAnswer() {
         return answer;
     }
