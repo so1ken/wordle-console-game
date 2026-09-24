@@ -47,11 +47,11 @@ public class GameService {
             session.recordAttempt(normalized);
             session.finishGame(GameStatus.WIN);
             return new GuessResult(List.of(
-                LetterStatus.CORRECT,
-                LetterStatus.CORRECT,
-                LetterStatus.CORRECT,
-                LetterStatus.CORRECT,
-                LetterStatus.CORRECT));
+                    LetterStatus.CORRECT,
+                    LetterStatus.CORRECT,
+                    LetterStatus.CORRECT,
+                    LetterStatus.CORRECT,
+                    LetterStatus.CORRECT));
         }
 
         List<LetterStatus> statuses = computeStatuses(session.getAnswer(), normalized);
